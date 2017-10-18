@@ -2,13 +2,14 @@
 #2017-10-01 krr4m4rr0 + k4t
 #Kanbas bat marrazteko. Marraztutako koordenatuen arabera, soinua erreproduzitu.
 #dependentziak: Pygame, fludisynth, mingus
-#
+#wav era pasatzeko, etorkizunean midito2audio? https://pypi.python.org/pypi/midi2audio/0.1.1
 #https://stackoverflow.com/questions/40439367/how-to-draw-cursor-with-pygame
 import sys
 import pygame 
 import time
 import mingus
-import json
+#import json
+import threading
 from mingus.midi import fluidsynth
 from mingus.containers.note import Note
 
@@ -27,6 +28,7 @@ white = [255,255,255]
 #leihoaren tamaina
 size = [960,540]
 zerrenda = []
+zerrendaBase = []
 nirekatea = "{"
 #beharrezko irudien karga
 Cursor = pygame.image.load('/home/galtzagorri/Mahaigaina/cursor.png')
@@ -60,21 +62,32 @@ def erreproduzitu_sekuentzia():
         print zerrenda[i].posy
 
 
-#Marrazkiko koordenatuak fluidsynth bitartez erreproduzitzeko funtzioa (7 koordenatuaren arabera)
+#Marrazkiko koordenatuak fluidsynth bitartez erreproduzitzeko funtzioa ( koordenatuaren arabera)
 
 def erreproduzitu_marrazkia(screen):
-    fluidsynth.init('/home/galtzagorri/Mahaigaina/grand-piano-YDP-20160804.sf2',"alsa")
+    fluidsynth.init('/home/galtzagorri/Mahaigaina/Arachno SoundFont - Version 1.0.sf2',"alsa")
     for i in range(0,len(zerrenda)):
-        print zerrenda[i].posx
+        print zerrenda[i].posy
         nota = (zerrenda[i].posy) % 127
         fluidsynth.play_Note(nota,1,100)
         time.sleep(0.5)
-    #fluidsynth.play_Note(23,2,100)
-    #fluidsynth.play_Note(42,3,100)
-    #time.sleep(1)
-    #fluidsynth.play_Note(63,1,100)
-    #fluidsynth.play_Note(23,2,100)
-    #time.sleep(1)
+   
+
+def erreproduzitu_marrazkia2(screen):
+    fluidsynth.init('/home/galtzagorri/Mahaigaina/Arachno SoundFont - Version 1.0.sf2',"alsa")
+    #fluidsynth.init('/home/galtzagorri/Mahaigaina/grand-piano-YDP-20160804.sf2',"alsa")
+    for i in range(0,len(zerrenda)):
+        print zerrenda[i].posy
+        print zerrendaBase[i].posy
+        nota = (zerrenda[i].posy) % 127
+        nota2 = (zerrendaBase[i].posy) % 126
+        t = threading.Thread(target=fluidsynth.play_Note(nota,1,100))
+        t2 = threading.Thread(target=fluidsynth.play_Note(nota2,1,100))
+        #t.start()
+        #t2.start()
+        #fluidsynth.play_Note(nota,1,100)
+        #fluidsynth.play_Note(nota2,2,100)
+        time.sleep(0.5)
 
 # menua marrazeko funtzioa
 def menua_marraztu(screen):
@@ -95,7 +108,8 @@ def datuak_gorde(x,y):
     
     k = Koordenatua(x,y)
     zerrenda.append(k)
-    print 'gordetako balioa' + str(x) + ':>' + str(y)
+    zerrendaBase.append(k)
+    print 'gordetako balioak' + str(x) + ':>' + str(y)
   
     
 
@@ -114,9 +128,7 @@ def marraztu_kurtsorea(screen,x,y):
         #sys.stdout=open("/home/galtzagorri/Mahaigaina/fitxa.txt","a")
         #print(x,y)
         #sys.stdout.close()
-        #draw_area = x,y
-        #screen.blit(image1, draw_area)
-        #pygame.display.update()
+     
         #koordenatu zehatzak erabili, aurrez kanbasa ondo erabaki EKINTZA EZBERDINAK EGIKARITZEKO
         if ((960>x>100) and (540>y>100)):
             #print "baldintza bete da"
@@ -127,22 +139,14 @@ def marraztu_kurtsorea(screen,x,y):
             screen.fill(white)
             menua_marraztu(screen)
             zerrenda = []
+            zerrendaBase = []
         elif (((x>120) and (x<300)) and ((y>0) and (y<150))):
-            erreproduzitu_marrazkia(screen)
-            #for i in range(len(zerrenda)):
-            #    print zerrenda[i]
-            #json_string = json.dumps(zerrenda)
+            erreproduzitu_marrazkia2(screen)
             erreproduzitu_sekuentzia()
-            #print json_string
-            #pygame.draw.line(screen, LINE_COLOR, (0, 0), (49, 49))
+       
 	
-        #screen.convert()
-        #marraztu_kanbasa(screen,0,0)
- 	#draw_on = True
-        #pygame.draw.line(screen,(255,0,0),(x,y),(x,y+10),0)
-        #pygame.display.flip()
+     
     else:
-        #screen.blit(Cursor,(x,y-48))--->
         #print "klik egin gabe"
         LINE_COLOR = (240,0,0)
 
@@ -165,7 +169,4 @@ while done==False:
     marraztu_kurtsorea(screen,x,y)
     pygame.display.flip()
     clock.tick(60)
-
-
-
 
