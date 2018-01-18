@@ -1,6 +1,7 @@
 # Jokutxoa 1.0
 # Pygame liburutegia frogatzen
-# https://stackoverflow.com/questions/10389487/spawning-multiple-of-the-same-sprite#10418347
+# https://stackoverflow.com/questions/10389487/spawning-multiple-of-the-same-sprite#10418347 >hainbat etsai
+#https://stackoverflow.com/questions/8303685/how-would-i-display-the-score-in-this-simple-game> markagailu sinplea
 
 # *********************************************************************************************
 #1.-liburutegiak inportatu ********************************************************************
@@ -41,7 +42,10 @@ def main():
 
     #pygame.init()
     screen = pygame.display.set_mode((640, 480))
+    #markagailua?
+
     #gure jokalaria izango dena eta fondoaren instantziak
+
 
     jokalaria = ahatetxoa()
     f = fondoa()
@@ -51,6 +55,9 @@ def main():
     #3.1.- JOKU programa nagusiko BEGIZTA nagusia > X sakatu arte ez da amaituko
 
     while True:
+        font = pygame.font.Font(None, 24)
+        text = font.render("[*]Puntuak: " + str(puntuak) + " [*]Bizitzak: " + str(jokalaria.bizitzak), 1, (10, 10, 10))
+        textpos = text.get_rect(centerx=screen.get_width() / 2)
         if jokalaria.bizitzak > 0:
             nirekont = nirekont +1
             # Ekintzaren bat egon ote den konprobatu > horren araberako aldaketak
@@ -114,7 +121,8 @@ def main():
             f.update(screen)
             jokalaria.update(screen)
             enemies.draw(screen)
-
+            # markagailua inprimatu
+            screen.blit(text, textpos)
             # jokalaria.update(screen)
             jokajota = pygame.sprite.spritecollide(jokalaria, enemies, True)
             if jokajota:
