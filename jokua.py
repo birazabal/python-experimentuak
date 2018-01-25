@@ -53,6 +53,7 @@ def main():
     f = fondoa()
     # hainbat etsai batera maneiatzeko, taldea = group
     enemies = pygame.sprite.Group()
+    enemies2 = pygame.sprite.Group()
 
     #3.1.- JOKU programa nagusiko BEGIZTA nagusia > X sakatu arte ez da amaituko
 
@@ -79,7 +80,7 @@ def main():
                 if event.key == pygame.K_SPACE:
                     #print ("tiroo")
                     if not jokalaria.botata:
-                        jokalaria.tiro(screen, enemies)
+                        jokalaria.tiro(screen, enemies, enemies2)
 
             # HASI PANTAILEN LOGIKA: 2 PANTAILA, bakoitzak 2 FONDO, FONDO BAKOITZA 4 ALDIZ IKUSI
             # PANTAILAREN ARABERAKO MALTZURRAK SORTU (ENEMY KLASEAK)
@@ -92,6 +93,7 @@ def main():
             if (super == 1):
                 for x in range(0, 2):
                     enemies.add(Enemy(screen, 2))
+                    enemies2.add(Enemy2(screen,1))
                     kontm = kontm + 1
 
             if (nirekont < 1100):
@@ -105,16 +107,19 @@ def main():
             if nirekont == 2000:
                 nirekont = 0
             enemies.update()
+            enemies2.update()
             screen.fill((0,100,140))
             f.move(-2)
             f.update(screen)
             jokalaria.update(screen)
             enemies.draw(screen)
+            enemies2.draw(screen)
             # markagailua inprimatu
             screen.blit(text, textpos)
             # jokalaria.update(screen)
             jokajota = pygame.sprite.spritecollide(jokalaria, enemies, True)
-            if jokajota:
+            jokajota2 = pygame.sprite.spritecollide(jokalaria, enemies2, True)
+            if jokajota or jokajota2:
                 jokalaria.image.fill((255, 0, 0))
                 jokalaria.bizitzak = jokalaria.bizitzak - 1
                 print("JOKALARIAREN BIZITZAK:" + str(jokalaria.bizitzak))
@@ -132,7 +137,7 @@ def main():
 
 
 #********************************
-# 4.2.- ENEMY KLASEA
+# 4.2.- ENEMY KLASEA(k)
 #********************************
 
 class Enemy(pygame.sprite.Sprite):
@@ -173,6 +178,49 @@ class Enemy(pygame.sprite.Sprite):
                 self.image = pygame.image.load("supermaltzurra1.png")
             self.zein = 1
 
+class Enemy2(pygame.sprite.Sprite):
+
+            def __init__(self, screen, klasea):
+                pygame.sprite.Sprite.__init__(self)
+                # print "created a new sprite:", id(self)
+                self.klasea = klasea
+                if self.klasea == 1:
+                    self.image = pygame.image.load("planeta.png")
+                else:
+                    self.image = pygame.image.load("planeta.png")
+                self.rect = self.image.get_rect()
+                self.rect.move_ip(random.randint(screen.get_width() - 100, screen.get_width() + 20),
+                                  random.randint(-300, screen.get_height()))
+                self.nora = "be"
+                self.zein = 1
+
+            def update(self):
+                self.rect.move_ip(-8, 0)
+                if (self.nora == "be"):
+                    self.rect.move_ip(12, 8)
+                    self.nora = "ez"
+                    self.image = pygame.image. load("planeta2.png")
+                    print("behera")
+                elif (self.nora == "ez"):
+                    self.rect.move_ip(-6, 2)
+                    self.nora = "go"
+                    self.image = pygame.image.load("planeta.png")
+                    print("ezkerrera")
+                elif (self.nora == "go"):
+                    self.rect.move_ip(2, -5)
+                    self.nora = "esk"
+                    self.image = pygame.image.load("planeta2.png")
+                elif (self.nora == "esk"):
+                    self.rect.move_ip(2, 2)
+                    print ("eskuinera")
+                    self.nora = "be"
+
+                if self.zein == 1:
+                    self.image = pygame.image.load("planeta.png")
+                    self.zein = 2
+                else:
+                    self.image = pygame.image.load("planeta2.png")
+                    self.zein = 1
 
 
 #********************************
@@ -238,7 +286,7 @@ class ahatetxoa(pygame.sprite.Sprite):
         if pressed[K_DOWN]:
             self.move(0, 2)
 
-    def tiro(self, screen, maltzurrak):
+    def tiro(self, screen, maltzurrak,maltzurrak2):
         #ahatearen muturretik "proiektila bota"
         bala = proiektila(self.rect.left + 65, self.rect.top + 22)
         i = 0
@@ -246,7 +294,8 @@ class ahatetxoa(pygame.sprite.Sprite):
         while i < 20:
             bala.update(screen)
             maltzurjota = pygame.sprite.spritecollide(bala, maltzurrak, True)
-            if maltzurjota:
+            maltzurjota2 = pygame.sprite.spritecollide(bala, maltzurrak2, True)
+            if maltzurjota or maltzurjota2:
                 self.puntuak = self.puntuak + 1
                 i = 20
                 bala.suntsitu()
@@ -368,5 +417,7 @@ class fondoa(pygame.sprite.Sprite):
 # X.- PROGRAMA NAGUSIA HASIERATZEKO!
 if __name__ == "__main__":
     main() 
+
+
 
 
