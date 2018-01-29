@@ -99,6 +99,9 @@ def main():
             if (nirekont < 1100):
                 if nirekont in (200, 400, 500, 800, 900, 1000,1099):
                     kontm = 0
+            else:
+                nirekont = 0
+                #f.aldatu()
             #beste maltzurrak+++
             if nirekont in( 100,200,300, 1000, 1200):
                 super = 1
@@ -197,22 +200,22 @@ class Enemy2(pygame.sprite.Sprite):
             def update(self):
                 self.rect.move_ip(-8, 0)
                 if (self.nora == "be"):
-                    self.rect.move_ip(12, 8)
+                    self.rect.move_ip(14, 8)
                     self.nora = "ez"
                     self.image = pygame.image. load("planeta2.png")
-                    print("behera")
+                    #print("behera")
                 elif (self.nora == "ez"):
                     self.rect.move_ip(-6, 2)
                     self.nora = "go"
                     self.image = pygame.image.load("planeta.png")
-                    print("ezkerrera")
+                    #print("ezkerrera")
                 elif (self.nora == "go"):
                     self.rect.move_ip(2, -5)
                     self.nora = "esk"
                     self.image = pygame.image.load("planeta2.png")
                 elif (self.nora == "esk"):
                     self.rect.move_ip(2, 2)
-                    print ("eskuinera")
+                    #print ("eskuinera")
                     self.nora = "be"
 
                 if self.zein == 1:
@@ -261,8 +264,8 @@ class ahatetxoa(pygame.sprite.Sprite):
                 self.move(5, 0)
             if event.key == pygame.K_LEFT:
                 self.move(-4, 0)
-            if event.key == pygame.K_SPACE:
-                print("kaixo karapaixo")
+            #if event.key == pygame.K_SPACE:
+                #print("kaixo karapaixo")
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_UP:
@@ -362,7 +365,8 @@ class fondoa(pygame.sprite.Sprite):
             self.image = pygame.image.load("hiperkuakfondua2.png")
         elif self.zein == 2:
             self.image = pygame.image.load("hiperkuakfondua22.png")
-            #fondoa aldatzen joateko ???
+        elif self.zein == 3:
+            self.image = pygame.image.load("hiperkuakfondua2z.png")
         self.zein = self.zein + 1
         print self.zein
 
@@ -373,7 +377,10 @@ class fondoa(pygame.sprite.Sprite):
             self.rect.move_ip(1280, self.rect.top)
             self.zein = 2
             #fondo aldatu !!! ;)
+            self.aldatu()
+        if self.zein == 4:
             self.geratu()
+
     def geratu(self):
             # guztiz geratzeko self.rect.move_ip(0, 0)
             self.rect.move_ip(0, 0)
@@ -402,10 +409,12 @@ class fondoa(pygame.sprite.Sprite):
             if (self.rect.left > -1280):
                 self.rect.move_ip(abiadura, self.rect.top)
             else:
+                self.aldatu()
                 self.rect.move_ip(1280, self.rect.top)
                 self.zein = 2
                 # fondo aldatu !!! ;)
-                self.geratu()
+
+                #self.geratu()
 
         def geratu(self):
             # guztiz geratzeko self.rect.move_ip(0, 0)
@@ -417,7 +426,4 @@ class fondoa(pygame.sprite.Sprite):
 # X.- PROGRAMA NAGUSIA HASIERATZEKO!
 if __name__ == "__main__":
     main() 
-
-
-
 
