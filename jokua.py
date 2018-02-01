@@ -54,7 +54,7 @@ def main():
     # hainbat etsai batera maneiatzeko, taldea = group
     enemies = pygame.sprite.Group()
     enemies2 = pygame.sprite.Group()
-
+    kontziklo = 0
     #3.1.- JOKU programa nagusiko BEGIZTA nagusia > X sakatu arte ez da amaituko
 
     while True:
@@ -82,36 +82,43 @@ def main():
                     if not jokalaria.botata:
                         jokalaria.tiro(screen, enemies, enemies2)
 
-            # HASI PANTAILEN LOGIKA: 2 PANTAILA, bakoitzak 2 FONDO, FONDO BAKOITZA 4 ALDIZ IKUSI
+            # HASI PANTAILEN LOGIKA: 2 PANTAILA, bakoitzak 2 FONDO, FONDO BAKOITZA nirekont-en arabera 4 ALDIZ IKUSI
             # PANTAILAREN ARABERAKO MALTZURRAK SORTU (ENEMY KLASEAK)
             # KASU HONETAN DENA NIRE KONTAGAILUAREN ARABERA... :( kutretxo, baina hastekooo
-            if (pantaila == 1 and kontm < 9):
-                for x in range(0, 2):
-                    enemies.add(Enemy(screen, 1))
-                    kontm = kontm + 1
-            #beste maltzurrak...#
-            if (super == 1):
-                for x in range(0, 2):
-                    enemies.add(Enemy(screen, 2))
-                    enemies2.add(Enemy2(screen,1))
-                    kontm = kontm + 1
+            # maltzurrak 9 aldiz sortu...
 
-            if (nirekont < 1100):
-                if nirekont in (200, 400, 500, 800, 900, 1000,1099):
+            #hasierako maltzurrak SORTU (enemy 1)
+            if f.fziklo == 1 or f.fziklo == 2:
+                if (kontm < 9):
+                    for x in range(0, 2):
+                        enemies.add(Enemy(screen, 1))
+                        kontm = kontm + 1
+                if nirekont in (200, 400, 500, 800, 900, 1000, 1099):
                     kontm = 0
-            else:
-                nirekont = 0
-                #f.aldatu()
-            #beste maltzurrak+++
-            if nirekont in( 100,200,300, 1000, 1200):
-                super = 1
-            else:
-                super = 0
-            if nirekont == 2000:
+            elif f.fziklo == 3 or f.fziklo == 4:
+                #"supermaltzurrak" hasieratzeko
+                if (kontm < 9):
+                    for x in range(0, 2):
+                        # 1, 2  etsai motak, horizontalean mugitu
+                        enemies.add(Enemy(screen, 1))
+                        enemies.add(Enemy(screen, 2))
+                        kontm = kontm + 1
+                if nirekont in (200, 400, 500, 800, 900, 1000, 1099):
+                    kontm = 0
+            elif f.fziklo == 4:
+                if (kontm < 9):
+                    for x in range(0, 2):
+                        #1,2 eta 3 et
+                        enemies.add(Enemy(screen, 1))
+                        enemies.add(Enemy(screen, 2))
+                        enemies2.add(Enemy2(screen, 1))
+                        kontm = kontm + 1
+
+            if nirekont == 1600:
                 nirekont = 0
             enemies.update()
             enemies2.update()
-            screen.fill((0,100,140))
+            screen.fill((0, 100, 140))
             f.move(-2)
             f.update(screen)
             jokalaria.update(screen)
@@ -278,7 +285,7 @@ class ahatetxoa(pygame.sprite.Sprite):
                 self.move(-3, 0)
 
     def mugitub(self):
-
+        #if self.rect.left
         pressed = pygame.key.get_pressed()
         if pressed[K_LEFT]:
             self.move(-2, 0)
@@ -359,6 +366,7 @@ class fondoa(pygame.sprite.Sprite):
         self.rect.top = 0
         self.rect.left = 0
         self.zein = 1
+        self.fziklo = 0
 
     def aldatu(self):
         if self.zein == 1:
@@ -371,15 +379,20 @@ class fondoa(pygame.sprite.Sprite):
         print self.zein
 
     def move(self, abiadura):
+        # fondoen logika koordenatuen arabera.
+        # 1 eta 2 fondoak 4 aldiz mugituko dira, eta 3. fondoa berriz geldik geratuko da
         if (self.rect.left > -1280):
             self.rect.move_ip(abiadura, self.rect.top)
         else:
+            self.fziklo = self.fziklo + 1
+            if self.fziklo == 4:
+                if self.zein == 3:
+                    self.geratu()
+                else:
+                    self.aldatu()
+                    self.zein = self.zein + 1
+                    self.fziklo = 0
             self.rect.move_ip(1280, self.rect.top)
-            self.zein = 2
-            #fondo aldatu !!! ;)
-            self.aldatu()
-        if self.zein == 4:
-            self.geratu()
 
     def geratu(self):
             # guztiz geratzeko self.rect.move_ip(0, 0)
@@ -394,7 +407,7 @@ class fondoa(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.top = 0
             self.rect.left = 0
-            self.zein = 1
+
 
         def aldatu(self):
             if self.zein == 1:
@@ -406,12 +419,21 @@ class fondoa(pygame.sprite.Sprite):
             print self.zein
 
         def move(self, abiadura):
+            # fondoen logika koordenatuen arabera.
+            #1 eta 2 fondoak 4 aldiz mugituko dira, eta 3. fondoa berriz geldik geratuko da
             if (self.rect.left > -1280):
                 self.rect.move_ip(abiadura, self.rect.top)
             else:
-                self.aldatu()
+                self.fziklo = self.fziklo + 1
+                if self.fziklo == 4:
+                    if self.zein == 3:
+                        self.geratu()
+                    else:
+                        self.aldatu()
+                        self.zein = self.zein + 1
+                        self.fziklo = 0
                 self.rect.move_ip(1280, self.rect.top)
-                self.zein = 2
+
                 # fondo aldatu !!! ;)
 
                 #self.geratu()
