@@ -51,13 +51,15 @@ def main():
 
     jokalaria = ahatetxoa()
     f = fondoa()
-    # hainbat etsai batera maneiatzeko, taldea = group
+    # hainbat etsai batera maneiatzeko, taldeak = group
     enemies = pygame.sprite.Group()
     enemies2 = pygame.sprite.Group()
     kontziklo = 0
+    mugituab = -2
     #3.1.- JOKU programa nagusiko BEGIZTA nagusia > X sakatu arte ez da amaituko
 
     while True:
+        #markagailua erakusteko + bizitzak
         font = pygame.font.Font(None, 24)
         text = font.render("| Puntuak: " + str(jokalaria.emanpuntuak()) + " || Bizitzak: " + str(jokalaria.emanbizitzak() + "|"), 1, (10, 10, 10))
         textpos = text.get_rect(centerx=screen.get_width() / 2)
@@ -75,7 +77,6 @@ def main():
                 else:
                     jokalaria.mugitua(event)
             #tiroa mejoratzeko...
-
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     #print ("tiroo")
@@ -93,9 +94,11 @@ def main():
                     for x in range(0, 2):
                         enemies.add(Enemy(screen, 1))
                         kontm = kontm + 1
-                if nirekont in (200, 400, 500, 800, 900, 1000, 1099):
+                if nirekont in (200, 400, 500, 800, 900, 1000, 1100):
                     kontm = 0
-            elif f.fziklo == 3 or f.fziklo == 4:
+                mugituab = -2
+                f.update(screen)
+            elif f.fziklo == 3:
                 #"supermaltzurrak" hasieratzeko
                 if (kontm < 9):
                     for x in range(0, 2):
@@ -103,8 +106,9 @@ def main():
                         enemies.add(Enemy(screen, 1))
                         enemies.add(Enemy(screen, 2))
                         kontm = kontm + 1
-                if nirekont in (200, 400, 500, 800, 900, 1000, 1099):
+                if nirekont in (100, 250, 500, 800, 900, 1000, 1100):
                     kontm = 0
+                mugituab = -3
             elif f.fziklo == 4:
                 if (kontm < 9):
                     for x in range(0, 2):
@@ -113,20 +117,20 @@ def main():
                         enemies.add(Enemy(screen, 2))
                         enemies2.add(Enemy2(screen, 1))
                         kontm = kontm + 1
-
-            if nirekont == 1600:
+                mugituab = 0
+            if nirekont == 1280:
                 nirekont = 0
             enemies.update()
             enemies2.update()
-            screen.fill((0, 100, 140))
-            f.move(-2)
-            f.update(screen)
-            jokalaria.update(screen)
-            enemies.draw(screen)
-            enemies2.draw(screen)
-            # markagailua inprimatu
-            screen.blit(text, textpos)
-            # jokalaria.update(screen)
+            #zikloaren arabera fondoa aldatu
+            if f.fziklo == 1:
+                screen.fill((0, 100, 140))
+            elif f.fziklo == 2:
+                screen.fill((255,0,0))
+            elif f.fziklo == 3:
+                screen.fill((0, 255, 0))
+            else:
+                screen.fill((0, 180, 140))
             jokajota = pygame.sprite.spritecollide(jokalaria, enemies, True)
             jokajota2 = pygame.sprite.spritecollide(jokalaria, enemies2, True)
             if jokajota or jokajota2:
@@ -135,9 +139,21 @@ def main():
                 print("JOKALARIAREN BIZITZAK:" + str(jokalaria.bizitzak))
                 botata = False
                 jokalaria.hasierarara()
+            f.move(mugituab)
+            f.update(screen)
+            jokalaria.update(screen)
+            enemies.draw(screen)
+            enemies2.draw(screen)
+            # markagailua inprimatu
+            screen.blit(text, textpos)
+            # jokalaria.update(screen)
+
             pygame.display.update()
             erlojua.tick(60)
         else:
+            if jokalaria.puntuak >100:
+                print("ZORIONAK,OSO PARTIDA ONA JOKATU DUZU !!! ;) ;) ;) ")
+                print("**************************************************")
             print("jokoa amaitu da!!! Puntuak = " + str(jokalaria.puntuak))
             exit()
 
@@ -366,9 +382,10 @@ class fondoa(pygame.sprite.Sprite):
         self.rect.top = 0
         self.rect.left = 0
         self.zein = 1
-        self.fziklo = 0
+        self.fziklo = 1
 
     def aldatu(self):
+        print self.zein
         if self.zein == 1:
             self.image = pygame.image.load("hiperkuakfondua2.png")
         elif self.zein == 2:
@@ -376,23 +393,25 @@ class fondoa(pygame.sprite.Sprite):
         elif self.zein == 3:
             self.image = pygame.image.load("hiperkuakfondua2z.png")
         self.zein = self.zein + 1
-        print self.zein
+
 
     def move(self, abiadura):
         # fondoen logika koordenatuen arabera.
-        # 1 eta 2 fondoak 4 aldiz mugituko dira, eta 3. fondoa berriz geldik geratuko da
+        # fondoa 4 aldiz mugituko da (zikloak) eta hauek egitean,fondoa aldatuko da
+        # 2. fondoaren 4.zikloan pantaila geratu egindo da, mugitu gabe.
         if (self.rect.left > -1280):
             self.rect.move_ip(abiadura, self.rect.top)
         else:
-            self.fziklo = self.fziklo + 1
             if self.fziklo == 4:
-                if self.zein == 3:
-                    self.geratu()
-                else:
+                if self.zein == 1:
                     self.aldatu()
-                    self.zein = self.zein + 1
                     self.fziklo = 0
-            self.rect.move_ip(1280, self.rect.top)
+                else:
+                    self.geratu()
+            else:
+                self.fziklo = self.fziklo + 1
+                print(self.fziklo)
+                self.rect.move_ip(1280, self.rect.top)
 
     def geratu(self):
             # guztiz geratzeko self.rect.move_ip(0, 0)
