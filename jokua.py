@@ -25,7 +25,7 @@ bizitzak = 3
 
 def main():
     #musika gehitu **** hh instrumental bat ***
-    #musikafitx = 'musika.mp3'
+    #musikafitx = 'pum.wav'
     pygame.init()
     #pygame.mixer.init()
     #pygame.mixer.music.load(musikafitx)
@@ -81,6 +81,7 @@ def main():
                 if event.key == pygame.K_SPACE:
                     #print ("tiroo")
                     if not jokalaria.botata:
+
                         jokalaria.tiro(screen, enemies, enemies2)
 
             # HASI PANTAILEN LOGIKA: 2 PANTAILA, bakoitzak 2 FONDO, FONDO BAKOITZA nirekont-en arabera 4 ALDIZ IKUSI
@@ -110,18 +111,26 @@ def main():
                     kontm = 0
                 mugituab = -3
             elif f.fziklo == 4:
-                if (kontm < 9):
-                    for x in range(0, 2):
-                        #1,2 eta 3 et
-                        enemies.add(Enemy(screen, 1))
-                        enemies.add(Enemy(screen, 2))
-                        enemies2.add(Enemy2(screen, 1))
-                        kontm = kontm + 1
-                mugituab = 0
+                if f.zein == 1:
+                    if (kontm < 9):
+                        for x in range(0, 2):
+                            #1,2 eta 3
+                            enemies.add(Enemy(screen, 1))
+                            enemies.add(Enemy(screen, 2))
+                            enemies2.add(Enemy2(screen, 1))
+                            kontm = kontm + 1
+                    if nirekont in (100, 250, 500, 800, 900, 1000, 1100):
+                        kontm = 0
+                    mugituab = -2
+                else:
+                    #superboss
+                    print("superboss agertu")
+                    mugituab = 0
             if nirekont == 1280:
                 nirekont = 0
             enemies.update()
             enemies2.update()
+
             #zikloaren arabera fondoa aldatu
             if f.fziklo == 1:
                 screen.fill((0, 100, 140))
@@ -314,6 +323,7 @@ class ahatetxoa(pygame.sprite.Sprite):
 
     def tiro(self, screen, maltzurrak,maltzurrak2):
         #ahatearen muturretik "proiektila bota"
+        #pygame.mixer.music.play()
         bala = proiektila(self.rect.left + 65, self.rect.top + 22)
         i = 0
         self.botata = True
