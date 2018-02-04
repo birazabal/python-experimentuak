@@ -31,34 +31,28 @@ def main():
     #pygame.mixer.music.load(musikafitx)
     #pygame.mixer.music.play()
     #******************************************
-    #3.1.- Nagusirako aldagai eta objetuen hasieratzeak
-    super = 0
-    zenbatfondo = 0
-    kontm = 0
-    haizea = 0
-    abiadura = 2
-    nirekont = 0
-    puntuak = 0
-    #proiektila botata edo ez dagoen jakiteko
-    botata = False
 
-    #pygame.init()
-    screen = pygame.display.set_mode((640, 480))
-    #markagailua?
+    #3.1.- Nagusirako aldagai eta objetuen hasieratzeak
+    # bi kontagailu, denbora ordez zikloak kontrolatzeko... + pantailaren hasieratzea
+    kontm = 0
+    nirekont = 0
+    screen = pygame.display.set_mode((840, 480))
 
     #gure jokalaria izango dena eta fondoaren instantziak
-
-
     jokalaria = ahatetxoa()
     f = fondoa()
+
     # hainbat etsai batera maneiatzeko, taldeak = group
     enemies = pygame.sprite.Group()
     enemies2 = pygame.sprite.Group()
-    kontziklo = 0
+    #fondoaren abiadurarentzat aldagaia
     mugituab = -2
-    #3.1.- JOKU programa nagusiko BEGIZTA nagusia > X sakatu arte ez da amaituko
+    #boss-a sortu den edo ez kontrolatzeko aldagaia
+    sb = 0
+    #3.1.- JOKU programa nagusiko BEGIZTA nagusia, jokalariak bizitzak galdu arte edo eta  X sakatu arte ez da amaituko
 
     while True:
+
         #markagailua erakusteko + bizitzak
         font = pygame.font.Font(None, 24)
         text = font.render("| Puntuak: " + str(jokalaria.emanpuntuak()) + " || Bizitzak: " + str(jokalaria.emanbizitzak() + "|"), 1, (10, 10, 10))
@@ -81,7 +75,6 @@ def main():
                 if event.key == pygame.K_SPACE:
                     #print ("tiroo")
                     if not jokalaria.botata:
-
                         jokalaria.tiro(screen, enemies, enemies2)
 
             # HASI PANTAILEN LOGIKA: 2 PANTAILA, bakoitzak 2 FONDO, FONDO BAKOITZA nirekont-en arabera 4 ALDIZ IKUSI
@@ -102,7 +95,7 @@ def main():
             elif f.fziklo == 3:
                 #"supermaltzurrak" hasieratzeko
                 if (kontm < 9):
-                    for x in range(0, 2):
+                    for x in range(0, 1):
                         # 1, 2  etsai motak, horizontalean mugitu
                         enemies.add(Enemy(screen, 1))
                         enemies.add(Enemy(screen, 2))
@@ -111,9 +104,9 @@ def main():
                     kontm = 0
                 mugituab = -3
             elif f.fziklo == 4:
-                if f.zein == 1:
+                if f.zein == 2:#hau zuzendu
                     if (kontm < 9):
-                        for x in range(0, 2):
+                        for x in range(0, 1):
                             #1,2 eta 3
                             enemies.add(Enemy(screen, 1))
                             enemies.add(Enemy(screen, 2))
@@ -124,8 +117,17 @@ def main():
                     mugituab = -2
                 else:
                     #superboss
-                    print("superboss agertu")
+                    #print("superboss agertu")
+                    if sb == 0:
+                        nireboss = Boss(screen)
+                        sb == 1
+                    nireboss.update()
+                    screen.blit(screen, nireboss)
                     mugituab = 0
+                    #bossekjota = pygame.sprite.spritecollide(jokalaria, nireboss, True)
+                    #if bossekjota:
+                    #    print ("bossek jota")
+
             if nirekont == 1280:
                 nirekont = 0
             enemies.update()
@@ -195,10 +197,10 @@ class Enemy(pygame.sprite.Sprite):
         else:
             #saiaera maltzurrak modu ezberdinean mugitzeko klasearen arabera
             if (self.nora == "gora"):
-                self.rect.move_ip(-2, 0)
+                self.rect.move_ip(-4, 0)
                 self.nora == "behera"
             else:
-                self.rect.move_ip(-2, -2)
+                self.rect.move_ip(-4, -2)
                 self.nora == "gora"
         if self.zein == 1:
             if self.klasea == 1:
@@ -257,6 +259,18 @@ class Enemy2(pygame.sprite.Sprite):
                     self.image = pygame.image.load("planeta2.png")
                     self.zein = 1
 
+class Boss(pygame.sprite.Sprite):
+
+    def __init__(self, screen):
+        pygame.sprite.Sprite.__init__(self)
+        # print "created a new sprite:", id(self)
+        self.image = pygame.image.load("superboss.png")
+        self.rect = self.image.get_rect()
+        self.rect.move_ip(random.randint(screen.get_width() - 20, screen.get_width() + 120),
+                                          random.randint(0, screen.get_height()))
+
+    def update(self, screen):
+            self.rect.move_ip(-3, 0)
 
 #********************************
 # 4.3.- AHATETXOA KLASEA
@@ -326,7 +340,6 @@ class ahatetxoa(pygame.sprite.Sprite):
         #pygame.mixer.music.play()
         bala = proiektila(self.rect.left + 65, self.rect.top + 22)
         i = 0
-        self.botata = True
         while i < 20:
             bala.update(screen)
             maltzurjota = pygame.sprite.spritecollide(bala, maltzurrak, True)
@@ -341,7 +354,7 @@ class ahatetxoa(pygame.sprite.Sprite):
                 bala.move(screen, 15)
                 self.botata = True
 
-            self.botata = False
+        self.botata = False
 
     def hasierarara(self):
         self.rect.top = 100
@@ -414,8 +427,8 @@ class fondoa(pygame.sprite.Sprite):
         else:
             if self.fziklo == 4:
                 if self.zein == 1:
+                    self.fziklo = 1
                     self.aldatu()
-                    self.fziklo = 0
                 else:
                     self.geratu()
             else:
@@ -429,52 +442,34 @@ class fondoa(pygame.sprite.Sprite):
     def update(self, screen):
         screen.blit(self.image, self.rect)
 
-    class fondo_kaltegarria(pygame.sprite.Sprite):
-        def __init__(self):
-            pygame.sprite.Sprite.__init__(self)
-            self.image = pygame.image.load("hiperkuakfondua2.png")
-            self.rect = self.image.get_rect()
-            self.rect.top = 0
-            self.rect.left = 0
 
-
-        def aldatu(self):
-            if self.zein == 1:
-                self.image = pygame.image.load("hiperkuakfondua2.png")
-            elif self.zein == 2:
-                self.image = pygame.image.load("hiperkuakfondua2.png")
-                # fondoa aldatzen joateko ???
-            self.zein = self.zein + 1
-            print self.zein
-
-        def move(self, abiadura):
-            # fondoen logika koordenatuen arabera.
-            #1 eta 2 fondoak 4 aldiz mugituko dira, eta 3. fondoa berriz geldik geratuko da
-            if (self.rect.left > -1280):
-                self.rect.move_ip(abiadura, self.rect.top)
-            else:
-                self.fziklo = self.fziklo + 1
-                if self.fziklo == 4:
-                    if self.zein == 3:
-                        self.geratu()
-                    else:
-                        self.aldatu()
-                        self.zein = self.zein + 1
-                        self.fziklo = 0
-                self.rect.move_ip(1280, self.rect.top)
-
-                # fondo aldatu !!! ;)
-
-                #self.geratu()
-
-        def geratu(self):
-            # guztiz geratzeko self.rect.move_ip(0, 0)
-            self.rect.move_ip(0, 0)
-
-        def update(self, screen):
-            screen.blit(self.image, self.rect)
-
+#************ class MENUA etb ******************#
+class menua():
+    def __init__(self):
+        self.aukera = self.erakutsiMenua()
+    def erakutsiMenua(self):
+        print ("******************************************")
+        print ("****Ongi etorri super-ahatetxoa jokora****")
+        print ("******************************************")
+        print ("1.- Jolastu")
+        print("2.-Puntuazio taula ikusi")
+        print("3.-Irten")
+        self.aukera = raw_input("sartu zure aukera >> ")
+        if int(self.aukera) == 1:
+            print("jolastu")
+        elif int(self.aukera) == 3:
+            print("Eskerrik asko aplikazioa probatzeagatik ;)")
+            exit
+        else:
+            print("beste aukerak")
+        return self.aukera
+    def itzuliAukera(self):
+        return self.aukera
 # X.- PROGRAMA NAGUSIA HASIERATZEKO!
 if __name__ == "__main__":
-    main() 
+    m = menua()
+    a = m.itzuliAukera()
+    print a
+    if int(a) == 1:
+        main()
 
