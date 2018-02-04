@@ -120,9 +120,9 @@ def main():
                     #print("superboss agertu")
                     if sb == 0:
                         nireboss = Boss(screen)
-                        sb == 1
-                    nireboss.update()
-                    screen.blit(screen, nireboss)
+                        sb = 1
+                    #nireboss.update(screen)
+                    #screen.blit(screen, nireboss)
                     mugituab = 0
                     #bossekjota = pygame.sprite.spritecollide(jokalaria, nireboss, True)
                     #if bossekjota:
@@ -155,6 +155,8 @@ def main():
             jokalaria.update(screen)
             enemies.draw(screen)
             enemies2.draw(screen)
+            if sb == 1:
+                nireboss.update(screen)
             # markagailua inprimatu
             screen.blit(text, textpos)
             # jokalaria.update(screen)
@@ -261,16 +263,51 @@ class Enemy2(pygame.sprite.Sprite):
 
 class Boss(pygame.sprite.Sprite):
 
-    def __init__(self, screen):
+    def __init__(self,screen):
         pygame.sprite.Sprite.__init__(self)
-        # print "created a new sprite:", id(self)
         self.image = pygame.image.load("superboss.png")
         self.rect = self.image.get_rect()
-        self.rect.move_ip(random.randint(screen.get_width() - 20, screen.get_width() + 120),
-                                          random.randint(0, screen.get_height()))
+        self.rect.move_ip(screen.get_width(), screen.get_height()/2)
+        self.mugi = 0
+        self.mugiblok = 0
+        print("boss sortu")
 
     def update(self, screen):
-            self.rect.move_ip(-3, 0)
+        if self.mugi == 0:
+            if self.mugiblok < 35:
+                self.mugiblok = self.mugiblok + 1
+                self.rect.move_ip(-3, 0)
+            else:
+                self.mugi = 1
+                self.mugiblok = 0
+        elif self.mugi == 1:
+            if self.mugiblok < 20:
+                self.image = pygame.image.load("superboss2.png")
+                self.mugiblok = self.mugiblok + 1
+                self.rect.move_ip(0, -3)
+            else:
+                self.mugi = 2
+                self.mugiblok = 0
+        elif self.mugi == 2:
+            if self.mugiblok <20:
+                self.image = pygame.image.load("superboss.png")
+                self.mugiblok = self.mugiblok + 1
+                self.rect.move_ip(0, 3)
+            else:
+                self.mugi = 3
+                self.mugiblok = 0
+        elif self.mugi == 3:
+            self.image = pygame.image.load("superboss2.png")
+            if self.mugiblok <20:
+                self.mugiblok = self.mugiblok + 1
+                self.rect.move_ip(3, 0)
+            else:
+                self.mugi = 0
+                self.mugiblok = 0
+        screen.blit(self.image, self.rect)
+        pygame.display.update(self.rect)
+        print("boss mugitu" + str(self.mugi))
+
 
 #********************************
 # 4.3.- AHATETXOA KLASEA
