@@ -268,21 +268,23 @@ class Boss(pygame.sprite.Sprite):
         self.image = pygame.image.load("superboss.png")
         self.rect = self.image.get_rect()
         self.rect.move_ip(screen.get_width(), screen.get_height()/2)
+        self.zein = 1
         self.mugi = 0
         self.mugiblok = 0
+        self.tironoiz = 100
         print("boss sortu")
 
     def update(self, screen):
         if self.mugi == 0:
             if self.mugiblok < 35:
                 self.mugiblok = self.mugiblok + 1
-                self.rect.move_ip(-3, 0)
+                self.rect.move_ip(-5, -2)
+                #-5 ezkerrera -2 gora
             else:
                 self.mugi = 1
                 self.mugiblok = 0
         elif self.mugi == 1:
             if self.mugiblok < 20:
-                self.image = pygame.image.load("superboss2.png")
                 self.mugiblok = self.mugiblok + 1
                 self.rect.move_ip(0, -3)
             else:
@@ -290,24 +292,41 @@ class Boss(pygame.sprite.Sprite):
                 self.mugiblok = 0
         elif self.mugi == 2:
             if self.mugiblok <20:
-                self.image = pygame.image.load("superboss.png")
                 self.mugiblok = self.mugiblok + 1
                 self.rect.move_ip(0, 3)
             else:
                 self.mugi = 3
                 self.mugiblok = 0
         elif self.mugi == 3:
-            self.image = pygame.image.load("superboss2.png")
-            if self.mugiblok <20:
+            if self.mugiblok < 20:
                 self.mugiblok = self.mugiblok + 1
                 self.rect.move_ip(3, 0)
             else:
                 self.mugi = 0
                 self.mugiblok = 0
+        if self.zein == 1:
+            self.image = pygame.image.load("superboss.png")
+            self.zein = 2
+        else:
+            self.image = pygame.image.load("superboss2.png")
+            self.zein = 1
+        if self.tironoiz == 0:
+            self.tiro(screen)
+            self.tironoiz = 100
+        else:
+            self.tironoiz -= 1
+
         screen.blit(self.image, self.rect)
         pygame.display.update(self.rect)
         print("boss mugitu" + str(self.mugi))
 
+    def tiro(self, screen):
+        balaboss = proiektila(self.rect.left - 8 , self.rect.top + 35)
+        i = 0
+        while i < 100:
+            balaboss.move(screen, -4)
+            balaboss.update(screen)
+            i += 1
 
 #********************************
 # 4.3.- AHATETXOA KLASEA
@@ -431,6 +450,7 @@ class proiektila(pygame.sprite.Sprite):
 
     def suntsitu(self):
         self.image.fill((255, 255, 255))
+
     # ********************************
     # 4.5.- FONDOA KLASEA
     # ********************************
