@@ -91,20 +91,19 @@ def main():
                 if nirekont in (200, 400, 500, 800, 900, 1000, 1100):
                     kontm = 0
                 mugituab = -2
-                f.update(screen)
+                #f.update(screen)
             elif f.fziklo == 3:
-                #"supermaltzurrak" hasieratzeko
                 if (kontm < 9):
                     for x in range(0, 1):
                         # 1, 2  etsai motak, horizontalean mugitu
                         enemies.add(Enemy(screen, 1))
-                        enemies.add(Enemy(screen, 2))
-                        kontm = kontm + 1
+                    enemies.add(Enemy(screen, 2))
+                    kontm = kontm + 1
                 if nirekont in (100, 250, 500, 800, 900, 1000, 1100):
                     kontm = 0
                 mugituab = -3
             elif f.fziklo == 4:
-                if f.zein == 2:#hau zuzendu
+                if f.zein == 1:#hau zuzendu
                     if (kontm < 9):
                         for x in range(0, 1):
                             #1,2 eta 3
@@ -183,7 +182,7 @@ class Enemy(pygame.sprite.Sprite):
 
     def __init__(self, screen, klasea):
         pygame.sprite.Sprite.__init__(self)
-        #print "created a new sprite:", id(self)
+        #self.zein bi irudiak ezberdintzeko
         self.klasea = klasea
         if self.klasea == 1:
             self.image = pygame.image.load("maltzurra1.png")
@@ -191,19 +190,12 @@ class Enemy(pygame.sprite.Sprite):
             self.image = pygame.image.load("supermaltzurra1.png")
         self.rect = self.image.get_rect()
         self.rect.move_ip(random.randint(screen.get_width()-20, screen.get_width()+120), random.randint(0, screen.get_height()))
-        self.nora = "gora"
         self.zein = 1
     def update(self):
         if self.klasea == 1:
             self.rect.move_ip(-3, 0)
         else:
-            #saiaera maltzurrak modu ezberdinean mugitzeko klasearen arabera
-            if (self.nora == "gora"):
-                self.rect.move_ip(-4, 0)
-                self.nora == "behera"
-            else:
-                self.rect.move_ip(-4, -2)
-                self.nora == "gora"
+            self.rect.move_ip(-4, 0)
         if self.zein == 1:
             if self.klasea == 1:
                 self.image = pygame.image.load("maltzurra2.png")
@@ -318,7 +310,7 @@ class Boss(pygame.sprite.Sprite):
 
         screen.blit(self.image, self.rect)
         pygame.display.update(self.rect)
-        print("boss mugitu" + str(self.mugi))
+        #print("boss mugitu" + str(self.mugi))
 
     def tiro(self, screen):
         balaboss = proiektila(self.rect.left - 8 , self.rect.top + 35)
