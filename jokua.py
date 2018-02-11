@@ -49,8 +49,9 @@ def main():
     mugituab = -2
     #boss-a sortu den edo ez kontrolatzeko aldagaia
     sb = 0
-    btiro = 100
-    bbmugitzen = False
+    jokajota3 = False
+    jokajota4 = False
+
     #3.1.- JOKU programa nagusiko BEGIZTA nagusia, jokalariak bizitzak galdu arte edo eta  X sakatu arte ez da amaituko
 
     while True:
@@ -128,6 +129,11 @@ def main():
                     #bossekjota = pygame.sprite.spritecollide(jokalaria, nireboss, True)
                     #if bossekjota:
                     #    print ("bossek jota")
+                    if nireboss.rect.colliderect(jokalaria) == 1:
+                        jokajota3 = True
+                    #if nireboss.balaboss.rect.colliderect(jokalaria) == 1:
+                        jokajota4 = True
+
             if nirekont == 1280:
                 nirekont = 0
             enemies.update()
@@ -136,15 +142,16 @@ def main():
             if f.fziklo == 1:
                 screen.fill((0, 100, 140))
             elif f.fziklo == 2:
-                screen.fill((255,0,0))
+                screen.fill((0, 120 ,160))
             elif f.fziklo == 3:
-                screen.fill((0, 255, 0))
+                screen.fill((0, 130, 180))
             else:
                 screen.fill((0, 180, 140))
+
             jokajota = pygame.sprite.spritecollide(jokalaria, enemies, True)
             jokajota2 = pygame.sprite.spritecollide(jokalaria, enemies2, True)
-            #jokajota3 = pygame.sprite.spritecollide(jokalaria,balaboss,True)
-            if jokajota or jokajota2:
+
+            if jokajota or jokajota2 or jokajota3 or jokajota4:
                 jokalaria.image.fill((255, 0, 0))
                 jokalaria.bizitzak = jokalaria.bizitzak - 1
                 print("JOKALARIAREN BIZITZAK:" + str(jokalaria.bizitzak))
@@ -158,19 +165,6 @@ def main():
             #boss kontrolatzeko zatia /
             if sb == 1:
                 nireboss.update(screen)
-                btiro = btiro - 1
-                if (btiro == 0):
-                    bbmugitzen = True
-                    balaboss = nireboss.tiro(screen)
-                    btiro = btiro + 200
-                else:
-                    if btiro > 100 and bbmugitzen == True:
-                        #balen abiadura
-                        balaboss.move(screen, -8)
-                        balaboss.update(screen)
-                    elif bbmugitzen == True and btiro == 100:
-                        bbmugitzen = False
-
             # markagailua inprimatu
             screen.blit(text, textpos)
             # jokalaria.update(screen)
@@ -278,14 +272,17 @@ class Boss(pygame.sprite.Sprite):
         self.zein = 1
         self.mugi = 0
         self.mugiblok = 0
-        self.tironoiz = 100
+        self.btiro = 100
+        self.bbmugitzen = False
+        self.balaboss = proiektila
+
         print("boss sortu")
 
     def update(self, screen):
         if self.mugi == 0:
             if self.mugiblok < 35:
                 self.mugiblok = self.mugiblok + 1
-                self.rect.move_ip(-5, -2)
+                self.rect.move_ip(-3, -1)
                 #-5 ezkerrera -2 gora
             else:
                 self.mugi = 1
@@ -293,7 +290,7 @@ class Boss(pygame.sprite.Sprite):
         elif self.mugi == 1:
             if self.mugiblok < 20:
                 self.mugiblok = self.mugiblok + 1
-                self.rect.move_ip(0, -3)
+                self.rect.move_ip(0, -2)
             else:
                 self.mugi = 2
                 self.mugiblok = 0
@@ -322,14 +319,27 @@ class Boss(pygame.sprite.Sprite):
         #    self.tironoiz = 100
         #else:
         #    self.tironoiz -= 1
+        self.btiro = self.btiro - 1
+        if (self.btiro == 0):
+            self.bbmugitzen = True
+            self.balaboss = self.tiro(screen)
+            self.btiro = self.btiro + 90
+        else:
+            if self.btiro > 30 and self.bbmugitzen:
+                # balen abiadura
+                self.balaboss.move(screen, -8)
+                self.balaboss.update(screen)
+            elif self.bbmugitzen and self.btiro == 30:
+                self.bbmugitzen = False
+                self.bbtiro = 1
 
         screen.blit(self.image, self.rect)
         pygame.display.update(self.rect)
         #print("boss mugitu" + str(self.mugi))
 
     def tiro(self, screen):
-        balaboss = proiektila(self.rect.left + 20 , self.rect.top + 55)
-        return balaboss
+        bss = proiektila(self.rect.left + 20, self.rect.top + 55)
+        return bss
 
 #********************************
 # 4.3.- AHATETXOA KLASEA
@@ -345,6 +355,9 @@ class ahatetxoa(pygame.sprite.Sprite):
         self.bizitzak = 3
         self.puntuak = 0
         self.botata = False
+        self.tiroluzera = 200
+        self.bala = proiektila
+        self.atiro = 60
     def move(self, vx, vy):
         self.rect.move_ip(vx, vy)
         if self.zein == 1:
@@ -397,23 +410,27 @@ class ahatetxoa(pygame.sprite.Sprite):
     def tiro(self, screen, maltzurrak,maltzurrak2):
         #ahatearen muturretik "proiektila bota"
         #pygame.mixer.music.play()
-        bala = proiektila(self.rect.left + 65, self.rect.top + 22)
+        self.botata = True
+        self.bala = proiektila(self.rect.left + 65, self.rect.top + 22)
         i = 0
-        while i < 20:
-            bala.update(screen)
-            maltzurjota = pygame.sprite.spritecollide(bala, maltzurrak, True)
-            maltzurjota2 = pygame.sprite.spritecollide(bala, maltzurrak2, True)
+
+        while self.atiro > 30 and self.botata:
+            # balen abiadura
+            self.bala.move(screen, 15)
+            self.bala.update(screen)
+            maltzurjota = pygame.sprite.spritecollide(self.bala, maltzurrak, True)
+            maltzurjota2 = pygame.sprite.spritecollide(self.bala, maltzurrak2, True)
             if maltzurjota or maltzurjota2:
                 self.puntuak = self.puntuak + 1
-                i = 20
-                bala.suntsitu()
+                self.atiro = 60
                 self.botata = False
-            else:
-                i += 1
-                bala.move(screen, 15)
-                self.botata = True
-
+                self.bala.suntsitu()
+            self.atiro -= 1
         self.botata = False
+        self.atiro = 60
+        screen.blit(self.bala.image, self.bala.rect)
+        pygame.display.update(self.bala.rect)
+
 
     def hasierarara(self):
         self.rect.top = 100
