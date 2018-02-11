@@ -49,6 +49,8 @@ def main():
     mugituab = -2
     #boss-a sortu den edo ez kontrolatzeko aldagaia
     sb = 0
+    btiro = 100
+    bbmugitzen = False
     #3.1.- JOKU programa nagusiko BEGIZTA nagusia, jokalariak bizitzak galdu arte edo eta  X sakatu arte ez da amaituko
 
     while True:
@@ -101,9 +103,9 @@ def main():
                     kontm = kontm + 1
                 if nirekont in (100, 250, 500, 800, 900, 1000, 1100):
                     kontm = 0
-                mugituab = -3
+                mugituab = -2
             elif f.fziklo == 4:
-                if f.zein == 1:#hau zuzendu
+                if f.zein == 2:#hau zuzendu >> 1 jarri gero
                     if (kontm < 9):
                         for x in range(0, 1):
                             #1,2 eta 3
@@ -126,12 +128,10 @@ def main():
                     #bossekjota = pygame.sprite.spritecollide(jokalaria, nireboss, True)
                     #if bossekjota:
                     #    print ("bossek jota")
-
             if nirekont == 1280:
                 nirekont = 0
             enemies.update()
             enemies2.update()
-
             #zikloaren arabera fondoa aldatu
             if f.fziklo == 1:
                 screen.fill((0, 100, 140))
@@ -143,6 +143,7 @@ def main():
                 screen.fill((0, 180, 140))
             jokajota = pygame.sprite.spritecollide(jokalaria, enemies, True)
             jokajota2 = pygame.sprite.spritecollide(jokalaria, enemies2, True)
+            #jokajota3 = pygame.sprite.spritecollide(jokalaria,balaboss,True)
             if jokajota or jokajota2:
                 jokalaria.image.fill((255, 0, 0))
                 jokalaria.bizitzak = jokalaria.bizitzak - 1
@@ -154,8 +155,22 @@ def main():
             jokalaria.update(screen)
             enemies.draw(screen)
             enemies2.draw(screen)
+            #boss kontrolatzeko zatia /
             if sb == 1:
                 nireboss.update(screen)
+                btiro = btiro - 1
+                if (btiro == 0):
+                    bbmugitzen = True
+                    balaboss = nireboss.tiro(screen)
+                    btiro = btiro + 200
+                else:
+                    if btiro > 100 and bbmugitzen == True:
+                        #balen abiadura
+                        balaboss.move(screen, -8)
+                        balaboss.update(screen)
+                    elif bbmugitzen == True and btiro == 100:
+                        bbmugitzen = False
+
             # markagailua inprimatu
             screen.blit(text, textpos)
             # jokalaria.update(screen)
@@ -302,23 +317,19 @@ class Boss(pygame.sprite.Sprite):
         else:
             self.image = pygame.image.load("superboss2.png")
             self.zein = 1
-        if self.tironoiz == 0:
-            self.tiro(screen)
-            self.tironoiz = 100
-        else:
-            self.tironoiz -= 1
+        #if self.tironoiz == 0:
+        #    self.tiro(screen)
+        #    self.tironoiz = 100
+        #else:
+        #    self.tironoiz -= 1
 
         screen.blit(self.image, self.rect)
         pygame.display.update(self.rect)
         #print("boss mugitu" + str(self.mugi))
 
     def tiro(self, screen):
-        balaboss = proiektila(self.rect.left - 8 , self.rect.top + 35)
-        i = 0
-        while i < 100:
-            balaboss.move(screen, -4)
-            balaboss.update(screen)
-            i += 1
+        balaboss = proiektila(self.rect.left + 20 , self.rect.top + 55)
+        return balaboss
 
 #********************************
 # 4.3.- AHATETXOA KLASEA
