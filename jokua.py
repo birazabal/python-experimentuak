@@ -121,7 +121,7 @@ def main():
                     #superboss
                     #print("superboss agertu")
                     if sb == 0:
-                        nireboss = Boss(screen)
+                        nireboss = Boss(screen, jokalaria)
                         sb = 1
                     #nireboss.update(screen)
                     #screen.blit(screen, nireboss)
@@ -131,8 +131,9 @@ def main():
                     #    print ("bossek jota")
                     if nireboss.rect.colliderect(jokalaria) == 1:
                         jokajota3 = True
-                    #if nireboss.balaboss.rect.colliderect(jokalaria) == 1:
-                        jokajota4 = True
+                    #if nireboss.balaboss.rect:
+                    #    if jokalaria.rect.colliderect(nireboss.balaboss.rect) == 1:
+                    #        jokajota4 = True
 
             if nirekont == 1280:
                 nirekont = 0
@@ -144,7 +145,7 @@ def main():
             elif f.fziklo == 2:
                 screen.fill((0, 120 ,160))
             elif f.fziklo == 3:
-                screen.fill((0, 130, 180))
+                screen.fill((0, 130, 200))
             else:
                 screen.fill((0, 180, 140))
 
@@ -175,7 +176,10 @@ def main():
             if jokalaria.puntuak >100:
                 print("ZORIONAK,OSO PARTIDA ONA JOKATU DUZU !!! ;) ;) ;) ")
                 print("**************************************************")
+                #fitxategira pasatu
+                izena = raw_input("sartu zure izena mesedez:")
             print("jokoa amaitu da!!! Puntuak = " + str(jokalaria.puntuak))
+            print("jokalaria: " + izena)
             exit()
 
 #***********************************************************************************************
@@ -264,7 +268,7 @@ class Enemy2(pygame.sprite.Sprite):
 
 class Boss(pygame.sprite.Sprite):
 
-    def __init__(self,screen):
+    def __init__(self,screen,jokalaria):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("superboss.png")
         self.rect = self.image.get_rect()
@@ -275,7 +279,8 @@ class Boss(pygame.sprite.Sprite):
         self.btiro = 100
         self.bbmugitzen = False
         self.balaboss = proiektila
-
+        self.kolpeak = 100
+        self.jokalaria = jokalaria
         print("boss sortu")
 
     def update(self, screen):
@@ -327,8 +332,14 @@ class Boss(pygame.sprite.Sprite):
         else:
             if self.btiro > 30 and self.bbmugitzen:
                 # balen abiadura
-                self.balaboss.move(screen, -8)
+                self.balaboss.move(screen, -9)
                 self.balaboss.update(screen)
+                # balek jokalaria jotzen ote duten frogatu
+                if self.jokalaria.rect.colliderect(self.balaboss) == 1:
+                    self.jokalaria.hasierarara()
+                    self.jokalaria.bizitzak -=1
+                    #print("jota")
+
             elif self.bbmugitzen and self.btiro == 30:
                 self.bbmugitzen = False
                 self.bbtiro = 1
@@ -382,8 +393,6 @@ class ahatetxoa(pygame.sprite.Sprite):
                 self.move(5, 0)
             if event.key == pygame.K_LEFT:
                 self.move(-4, 0)
-            #if event.key == pygame.K_SPACE:
-                #print("kaixo karapaixo")
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_UP:
@@ -396,7 +405,6 @@ class ahatetxoa(pygame.sprite.Sprite):
                 self.move(-3, 0)
 
     def mugitub(self):
-        #if self.rect.left
         pressed = pygame.key.get_pressed()
         if pressed[K_LEFT]:
             self.move(-2, 0)
@@ -417,6 +425,7 @@ class ahatetxoa(pygame.sprite.Sprite):
         while self.atiro > 30 and self.botata:
             # balen abiadura
             self.bala.move(screen, 15)
+            screen.blit(self.bala.image, self.bala.rect)
             self.bala.update(screen)
             maltzurjota = pygame.sprite.spritecollide(self.bala, maltzurrak, True)
             maltzurjota2 = pygame.sprite.spritecollide(self.bala, maltzurrak2, True)
@@ -429,7 +438,7 @@ class ahatetxoa(pygame.sprite.Sprite):
         self.botata = False
         self.atiro = 60
         screen.blit(self.bala.image, self.bala.rect)
-        pygame.display.update(self.bala.rect)
+        #pygame.display.update(self.bala.rect)
 
 
     def hasierarara(self):
@@ -470,6 +479,8 @@ class proiektila(pygame.sprite.Sprite):
 
     def suntsitu(self):
         self.image.fill((255, 255, 255))
+    def ikutzen(self,zein):
+        return self.rect.colliderect(zein)
 
     # ********************************
     # 4.5.- FONDOA KLASEA
