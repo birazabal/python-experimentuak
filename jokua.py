@@ -36,7 +36,7 @@ def main():
     # bi kontagailu, denbora ordez zikloak kontrolatzeko... + pantailaren hasieratzea
     kontm = 0
     nirekont = 0
-    screen = pygame.display.set_mode((840, 480))
+    screen = pygame.display.set_mode((640, 480))
 
     #gure jokalaria izango dena eta fondoaren instantziak
     jokalaria = ahatetxoa()
@@ -87,7 +87,7 @@ def main():
 
             #hasierako maltzurrak SORTU (enemy 1)
             if f.fziklo == 1 or f.fziklo == 2:
-                if (kontm < 9):
+                if (kontm < 3):
                     for x in range(0, 2):
                         enemies.add(Enemy(screen, 1))
                         kontm = kontm + 1
@@ -96,7 +96,7 @@ def main():
                 mugituab = -2
                 #f.update(screen)
             elif f.fziklo == 3:
-                if (kontm < 9):
+                if (kontm < 4):
                     for x in range(0, 1):
                         # 1, 2  etsai motak, horizontalean mugitu
                         enemies.add(Enemy(screen, 1))
@@ -106,8 +106,8 @@ def main():
                     kontm = 0
                 mugituab = -2
             elif f.fziklo == 4:
-                if f.zein == 2:#hau zuzendu >> 1 jarri gero
-                    if (kontm < 9):
+                if f.zein == 1:#hau zuzendu >> 1 jarri gero
+                    if (kontm < 5):
                         for x in range(0, 1):
                             #1,2 eta 3
                             enemies.add(Enemy(screen, 1))
@@ -117,29 +117,23 @@ def main():
                     if nirekont in (100, 250, 500, 800, 900, 1000, 1100):
                         kontm = 0
                     mugituab = -2
+                    #f.aldatu()
+
                 else:
                     #superboss
                     #print("superboss agertu")
                     if sb == 0:
                         nireboss = Boss(screen, jokalaria)
                         sb = 1
-                    #nireboss.update(screen)
-                    #screen.blit(screen, nireboss)
                     mugituab = 0
-                    #bossekjota = pygame.sprite.spritecollide(jokalaria, nireboss, True)
-                    #if bossekjota:
-                    #    print ("bossek jota")
                     if nireboss.rect.colliderect(jokalaria) == 1:
                         jokajota3 = True
-                    #if nireboss.balaboss.rect:
-                    #    if jokalaria.rect.colliderect(nireboss.balaboss.rect) == 1:
-                    #        jokajota4 = True
 
             if nirekont == 1280:
                 nirekont = 0
             enemies.update()
             enemies2.update()
-            #zikloaren arabera fondoa aldatu
+            #zikloaren arabera  fondoaren kolorea  aldatzeko aukera
             if f.fziklo == 1:
                 screen.fill((0, 100, 140))
             elif f.fziklo == 2:
@@ -179,7 +173,7 @@ def main():
                 #fitxategira pasatu
                 izena = raw_input("sartu zure izena mesedez:")
             print("jokoa amaitu da!!! Puntuak = " + str(jokalaria.puntuak))
-            print("jokalaria: " + izena)
+            #print("jokalaria: " + izena)
             exit()
 
 #***********************************************************************************************
@@ -279,74 +273,81 @@ class Boss(pygame.sprite.Sprite):
         self.btiro = 100
         self.bbmugitzen = False
         self.balaboss = proiektila
-        self.kolpeak = 100
+        self.kolpeak = 5
         self.jokalaria = jokalaria
+        self.balakjotzen = False
         print("boss sortu")
 
     def update(self, screen):
-        if self.mugi == 0:
-            if self.mugiblok < 35:
-                self.mugiblok = self.mugiblok + 1
-                self.rect.move_ip(-3, -1)
-                #-5 ezkerrera -2 gora
+        if self.kolpeak > 0:
+            if self.mugi == 0:
+                if self.mugiblok < 35:
+                    self.mugiblok = self.mugiblok + 1
+                    self.rect.move_ip(-3, -1)
+                    #-5 ezkerrera -2 gora
+                else:
+                    self.mugi = 1
+                    self.mugiblok = 0
+            elif self.mugi == 1:
+                if self.mugiblok < 20:
+                    self.mugiblok = self.mugiblok + 1
+                    self.rect.move_ip(0, -2)
+                else:
+                    self.mugi = 2
+                    self.mugiblok = 0
+            elif self.mugi == 2:
+                if self.mugiblok <20:
+                    self.mugiblok = self.mugiblok + 1
+                    self.rect.move_ip(0, 3)
+                else:
+                    self.mugi = 3
+                    self.mugiblok = 0
+            elif self.mugi == 3:
+                if self.mugiblok < 20:
+                    self.mugiblok = self.mugiblok + 1
+                    self.rect.move_ip(3, 0)
+                else:
+                    self.mugi = 0
+                    self.mugiblok = 0
+            if self.zein == 1:
+                self.image = pygame.image.load("superboss.png")
+                self.zein = 2
             else:
-                self.mugi = 1
-                self.mugiblok = 0
-        elif self.mugi == 1:
-            if self.mugiblok < 20:
-                self.mugiblok = self.mugiblok + 1
-                self.rect.move_ip(0, -2)
-            else:
-                self.mugi = 2
-                self.mugiblok = 0
-        elif self.mugi == 2:
-            if self.mugiblok <20:
-                self.mugiblok = self.mugiblok + 1
-                self.rect.move_ip(0, 3)
-            else:
-                self.mugi = 3
-                self.mugiblok = 0
-        elif self.mugi == 3:
-            if self.mugiblok < 20:
-                self.mugiblok = self.mugiblok + 1
-                self.rect.move_ip(3, 0)
-            else:
-                self.mugi = 0
-                self.mugiblok = 0
-        if self.zein == 1:
-            self.image = pygame.image.load("superboss.png")
-            self.zein = 2
-        else:
-            self.image = pygame.image.load("superboss2.png")
-            self.zein = 1
-        #if self.tironoiz == 0:
-        #    self.tiro(screen)
-        #    self.tironoiz = 100
-        #else:
-        #    self.tironoiz -= 1
-        self.btiro = self.btiro - 1
-        if (self.btiro == 0):
-            self.bbmugitzen = True
-            self.balaboss = self.tiro(screen)
-            self.btiro = self.btiro + 90
-        else:
-            if self.btiro > 30 and self.bbmugitzen:
-                # balen abiadura
-                self.balaboss.move(screen, -9)
-                self.balaboss.update(screen)
-                # balek jokalaria jotzen ote duten frogatu
-                if self.jokalaria.rect.colliderect(self.balaboss) == 1:
-                    self.jokalaria.hasierarara()
-                    self.jokalaria.bizitzak -=1
-                    #print("jota")
+                self.image = pygame.image.load("superboss2.png")
+                self.zein = 1
+            if self.balakjotzen == False:
+                if self.rect.colliderect(self.jokalaria.bala) == 1:
+                    # print ("jokalariaren balak jo du boss")
+                    self.jokalaria.bala.suntsitu()
+                    self.kolpeak -= 1
+                    self.balakjotzen = True
 
-            elif self.bbmugitzen and self.btiro == 30:
-                self.bbmugitzen = False
-                self.bbtiro = 1
-
-        screen.blit(self.image, self.rect)
-        pygame.display.update(self.rect)
-        #print("boss mugitu" + str(self.mugi))
+            self.btiro = self.btiro - 1
+            if (self.btiro == 0):
+                self.bbmugitzen = True
+                self.balaboss = self.tiro(screen)
+                self.btiro = self.btiro + 90
+            else:
+                if self.btiro > 30 and self.bbmugitzen:
+                    # balen abiadura
+                    self.balaboss.move(screen, -9)
+                    self.balaboss.update(screen)
+                    # balek jokalaria jotzen ote duten frogatu
+                    if self.jokalaria.rect.colliderect(self.balaboss) == 1:
+                        self.jokalaria.hasierarara()
+                        self.jokalaria.bizitzak -=1
+                        #print("jota")
+                elif self.bbmugitzen and self.btiro == 30:
+                    self.bbmugitzen = False
+                    self.bbtiro = 1
+                    self.balakjotzen = False
+            screen.blit(self.image, self.rect)
+            pygame.display.update(self.rect)
+        else:
+            print("ZORIONAK, JOKOA AMAITU DUZU!!!")
+            print("*********GAME OVER************")
+            exit()
+            #print("boss mugitu" + str(self.mugi))
 
     def tiro(self, screen):
         bss = proiektila(self.rect.left + 20, self.rect.top + 55)
@@ -393,6 +394,8 @@ class ahatetxoa(pygame.sprite.Sprite):
                 self.move(5, 0)
             if event.key == pygame.K_LEFT:
                 self.move(-4, 0)
+            #if event.key == pygame.K_SPACE:
+                #print("kaixo karapaixo")
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_UP:
@@ -405,6 +408,7 @@ class ahatetxoa(pygame.sprite.Sprite):
                 self.move(-3, 0)
 
     def mugitub(self):
+        #if self.rect.left
         pressed = pygame.key.get_pressed()
         if pressed[K_LEFT]:
             self.move(-2, 0)
@@ -488,7 +492,7 @@ class proiektila(pygame.sprite.Sprite):
 class fondoa(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("hiperkuakfondua2.png")
+        self.image = pygame.image.load("hiperkuakfondua1.png")
         self.rect = self.image.get_rect()
         self.rect.top = 0
         self.rect.left = 0
@@ -496,14 +500,12 @@ class fondoa(pygame.sprite.Sprite):
         self.fziklo = 1
 
     def aldatu(self):
-        print self.zein
-        if self.zein == 1:
-            self.image = pygame.image.load("hiperkuakfondua2.png")
-        elif self.zein == 2:
-            self.image = pygame.image.load("hiperkuakfondua22.png")
-        elif self.zein == 3:
-            self.image = pygame.image.load("hiperkuakfondua2z.png")
+        print ("aldatu deituta " + str(self.zein))
         self.zein = self.zein + 1
+        if self.zein == 2:
+            self.image = pygame.image.load("hiperkuakfondua2.png")
+
+
 
 
     def move(self, abiadura):
@@ -515,7 +517,7 @@ class fondoa(pygame.sprite.Sprite):
         else:
             if self.fziklo == 4:
                 if self.zein == 1:
-                    self.fziklo = 1
+                    self.fziklo = 0
                     self.aldatu()
                 else:
                     self.geratu()
