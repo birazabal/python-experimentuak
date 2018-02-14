@@ -87,7 +87,7 @@ def main():
 
             #hasierako maltzurrak SORTU (enemy 1)
             if f.fziklo == 1 or f.fziklo == 2:
-                if (kontm < 3):
+                if kontm < 3:
                     for x in range(0, 2):
                         enemies.add(Enemy(screen, 1))
                         kontm = kontm + 1
@@ -107,7 +107,7 @@ def main():
                 mugituab = -2
             elif f.fziklo == 4:
                 if f.zein == 1:#hau zuzendu >> 1 jarri gero
-                    if (kontm < 5):
+                    if kontm < 5:
                         for x in range(0, 1):
                             #1,2 eta 3
                             enemies.add(Enemy(screen, 1))
@@ -120,8 +120,7 @@ def main():
                     #f.aldatu()
 
                 else:
-                    #superboss
-                    #print("superboss agertu")
+                    #2.zikloaren bukaeran > Boss agertu
                     if sb == 0:
                         nireboss = Boss(screen, jokalaria)
                         sb = 1
@@ -134,14 +133,17 @@ def main():
             enemies.update()
             enemies2.update()
             #zikloaren arabera  fondoaren kolorea  aldatzeko aukera
-            if f.fziklo == 1:
-                screen.fill((0, 100, 140))
-            elif f.fziklo == 2:
-                screen.fill((0, 120 ,160))
-            elif f.fziklo == 3:
-                screen.fill((0, 130, 200))
+            if f.zein == 1:
+                if f.fziklo == 1:
+                    screen.fill((0, 100, 140))
+                elif f.fziklo == 2:
+                    screen.fill((0, 120, 160))
+                elif f.fziklo == 3:
+                    screen.fill((0, 130, 200))
+                else:
+                    screen.fill((254, 156, 255))
             else:
-                screen.fill((0, 180, 140))
+                screen.fill((255,255,255))
 
             jokajota = pygame.sprite.spritecollide(jokalaria, enemies, True)
             jokajota2 = pygame.sprite.spritecollide(jokalaria, enemies2, True)
@@ -191,6 +193,7 @@ class Enemy(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         #self.zein bi irudiak ezberdintzeko
         self.klasea = klasea
+        self.bizizikloak = 500
         if self.klasea == 1:
             self.image = pygame.image.load("maltzurra1.png")
         else:
@@ -199,23 +202,26 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.move_ip(random.randint(screen.get_width()-20, screen.get_width()+120), random.randint(0, screen.get_height()))
         self.zein = 1
     def update(self):
-        if self.klasea == 1:
-            self.rect.move_ip(-3, 0)
-        else:
-            self.rect.move_ip(-4, 0)
-        if self.zein == 1:
+        if self.bizizikloak > 0:
             if self.klasea == 1:
-                self.image = pygame.image.load("maltzurra2.png")
+                self.rect.move_ip(-3, 0)
             else:
-                self.image = pygame.image.load("supermaltzurra2.png")
-            self.zein = 2
+                self.rect.move_ip(-4, 0)
+            if self.zein == 1:
+                if self.klasea == 1:
+                    self.image = pygame.image.load("maltzurra2.png")
+                else:
+                    self.image = pygame.image.load("supermaltzurra2.png")
+                self.zein = 2
+            else:
+                if self.klasea == 1:
+                    self.image = pygame.image.load("maltzurra1.png")
+                else:
+                    self.image = pygame.image.load("supermaltzurra1.png")
+                self.zein = 1
+            self.bizizikloak -= 1
         else:
-            if self.klasea == 1:
-                self.image = pygame.image.load("maltzurra1.png")
-            else:
-                self.image = pygame.image.load("supermaltzurra1.png")
-            self.zein = 1
-
+            self.kill()
 class Enemy2(pygame.sprite.Sprite):
 
             def __init__(self, screen, klasea):
@@ -231,34 +237,39 @@ class Enemy2(pygame.sprite.Sprite):
                                   random.randint(-300, screen.get_height()))
                 self.nora = "be"
                 self.zein = 1
+                self.bizizikloak = 500
 
             def update(self):
-                self.rect.move_ip(-8, 0)
-                if (self.nora == "be"):
-                    self.rect.move_ip(14, 8)
-                    self.nora = "ez"
-                    self.image = pygame.image. load("planeta2.png")
-                    #print("behera")
-                elif (self.nora == "ez"):
-                    self.rect.move_ip(-6, 2)
-                    self.nora = "go"
-                    self.image = pygame.image.load("planeta.png")
-                    #print("ezkerrera")
-                elif (self.nora == "go"):
-                    self.rect.move_ip(2, -5)
-                    self.nora = "esk"
-                    self.image = pygame.image.load("planeta2.png")
-                elif (self.nora == "esk"):
-                    self.rect.move_ip(2, 2)
-                    #print ("eskuinera")
-                    self.nora = "be"
+                if self.bizizikloak > 0:
+                    self.rect.move_ip(-8, 0)
+                    if (self.nora == "be"):
+                        self.rect.move_ip(14, 8)
+                        self.nora = "ez"
+                        self.image = pygame.image. load("planeta2.png")
+                        #print("behera")
+                    elif (self.nora == "ez"):
+                        self.rect.move_ip(-6, 2)
+                        self.nora = "go"
+                        self.image = pygame.image.load("planeta.png")
+                        #print("ezkerrera")
+                    elif (self.nora == "go"):
+                        self.rect.move_ip(2, -5)
+                        self.nora = "esk"
+                        self.image = pygame.image.load("planeta2.png")
+                    elif (self.nora == "esk"):
+                        self.rect.move_ip(2, 2)
+                        #print ("eskuinera")
+                        self.nora = "be"
+                    if self.zein == 1:
+                        self.image = pygame.image.load("planeta.png")
+                        self.zein = 2
+                    else:
+                        self.image = pygame.image.load("planeta2.png")
+                        self.zein = 1
 
-                if self.zein == 1:
-                    self.image = pygame.image.load("planeta.png")
-                    self.zein = 2
+                    self.bizizikloak -= 1
                 else:
-                    self.image = pygame.image.load("planeta2.png")
-                    self.zein = 1
+                    self.kill()
 
 class Boss(pygame.sprite.Sprite):
 
@@ -273,7 +284,7 @@ class Boss(pygame.sprite.Sprite):
         self.btiro = 100
         self.bbmugitzen = False
         self.balaboss = proiektila
-        self.kolpeak = 5
+        self.kolpeak = 7
         self.jokalaria = jokalaria
         self.balakjotzen = False
         print("boss sortu")
@@ -321,6 +332,11 @@ class Boss(pygame.sprite.Sprite):
                     self.jokalaria.bala.suntsitu()
                     self.kolpeak -= 1
                     self.balakjotzen = True
+                    if self.zein == 1:
+                        self.image = pygame.image.load("superboss3.png")
+            else:
+                if self.zein == 1:
+                    self.image = pygame.image.load("superboss3.png")
 
             self.btiro = self.btiro - 1
             if (self.btiro == 0):
@@ -542,7 +558,7 @@ class menua():
         print ("****Ongi etorri super-ahatetxoa jokora****")
         print ("******************************************")
         print ("1.- Jolastu")
-        print("2.-Puntuazio taula ikusi")
+        print("2.-Puntuazio taula ikusi") #inplementatu gabe
         print("3.-Irten")
         self.aukera = raw_input("sartu zure aukera >> ")
         if int(self.aukera) == 1:
