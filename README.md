@@ -14,7 +14,8 @@
 </br>
 <b>6.- jokua.py</b> > Pygame-ekin eginiko nire lehen jokoa ;) 
 </br>
-<img src="jokua_v1.png" style="align:center"/>
+<center><img src="jokua_v1.png""/></center>
+</br>
 </br>
     <i>dependentziak:</i> pygame
 </br>
