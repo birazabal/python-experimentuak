@@ -2,7 +2,8 @@
 # Pygame liburutegia frogatzen
 # https://stackoverflow.com/questions/10389487/spawning-multiple-of-the-same-sprite#10418347 >hainbat etsai
 #https://stackoverflow.com/questions/8303685/how-would-i-display-the-score-in-this-simple-game> markagailu sinplea
-
+#falta > ertzak kontrolatu, boss-en mugimentua ziklikoa bihurtu pantailatik irten gabe
+#ahatearen disparoa hobetu / beste disparomota bat?
 # *********************************************************************************************
 #1.-liburutegiak inportatu ********************************************************************
 # *********************************************************************************************
@@ -31,7 +32,6 @@ def main():
     #pygame.mixer.music.load(musikafitx)
     #pygame.mixer.music.play()
     #******************************************
-
     #3.1.- Nagusirako aldagai eta objetuen hasieratzeak
     # bi kontagailu, denbora ordez zikloak kontrolatzeko... + pantailaren hasieratzea
     kontm = 0
@@ -41,7 +41,6 @@ def main():
     #gure jokalaria izango dena eta fondoaren instantziak
     jokalaria = ahatetxoa()
     f = fondoa()
-
     # hainbat etsai batera maneiatzeko, taldeak = group
     enemies = pygame.sprite.Group()
     enemies2 = pygame.sprite.Group()
@@ -106,7 +105,7 @@ def main():
                     kontm = 0
                 mugituab = -2
             elif f.fziklo == 4:
-                if f.zein == 1:#hau zuzendu >> 1 jarri gero
+                if f.zein == 2:#hau zuzendu >> 1 jarri gero
                     if kontm < 5:
                         for x in range(0, 1):
                             #1,2 eta 3
@@ -120,16 +119,17 @@ def main():
                     #f.aldatu()
 
                 else:
-                    #2.zikloaren bukaeran > Boss agertu
+                    #2.zein 4.zikloan > Boss agertu
                     if sb == 0:
                         nireboss = Boss(screen, jokalaria)
                         sb = 1
                     mugituab = 0
                     if nireboss.rect.colliderect(jokalaria) == 1:
                         jokajota3 = True
-
+            #inre kontagailua hasieratu
             if nirekont == 1280:
                 nirekont = 0
+            #etsaien egoera eguneratu
             enemies.update()
             enemies2.update()
             #zikloaren arabera  fondoaren kolorea  aldatzeko aukera
@@ -137,13 +137,20 @@ def main():
                 if f.fziklo == 1:
                     screen.fill((0, 100, 140))
                 elif f.fziklo == 2:
-                    screen.fill((0, 120, 160))
+                    screen.fill((0, 100, 160))
                 elif f.fziklo == 3:
-                    screen.fill((0, 130, 200))
+                    screen.fill((0, 100, 220))
                 else:
-                    screen.fill((254, 156, 255))
+                    screen.fill((0, 100, 255))
             else:
-                screen.fill((255,255,255))
+                if f.fziklo == 1:
+                    screen.fill((100, 100, 140))
+                elif f.fziklo == 2:
+                    screen.fill((100, 100, 160))
+                elif f.fziklo == 3:
+                    screen.fill((0, 50, 0))
+                else:
+                    screen.fill((0, 100, 0))
 
             jokajota = pygame.sprite.spritecollide(jokalaria, enemies, True)
             jokajota2 = pygame.sprite.spritecollide(jokalaria, enemies2, True)
@@ -173,7 +180,7 @@ def main():
                 print("ZORIONAK,OSO PARTIDA ONA JOKATU DUZU !!! ;) ;) ;) ")
                 print("**************************************************")
                 #fitxategira pasatu
-                izena = raw_input("sartu zure izena mesedez:")
+                #izena = raw_input("sartu zure izena mesedez:")
             print("jokoa amaitu da!!! Puntuak = " + str(jokalaria.puntuak))
             #print("jokalaria: " + izena)
             exit()
@@ -273,7 +280,7 @@ class Enemy2(pygame.sprite.Sprite):
 
 class Boss(pygame.sprite.Sprite):
 
-    def __init__(self,screen,jokalaria):
+    def __init__(self, screen, jokalaria):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("superboss.png")
         self.rect = self.image.get_rect()
@@ -284,12 +291,14 @@ class Boss(pygame.sprite.Sprite):
         self.btiro = 100
         self.bbmugitzen = False
         self.balaboss = proiektila
-        self.kolpeak = 7
+        self.kolpeak = 5
         self.jokalaria = jokalaria
         self.balakjotzen = False
-        print("boss sortu")
 
     def update(self, screen):
+        font2 = pygame.font.Font(None, 24)
+        text2 = font2.render("Kolpeak: " + str(self.inprimatukolpeak()), 1, (10, 10, 10))
+        textpos2 = text2.get_rect(centerx=550, centery=420)
         if self.kolpeak > 0:
             if self.mugi == 0:
                 if self.mugiblok < 35:
@@ -334,10 +343,10 @@ class Boss(pygame.sprite.Sprite):
                     self.balakjotzen = True
                     if self.zein == 1:
                         self.image = pygame.image.load("superboss3.png")
+                    self.jokalaria.puntuak = self.jokalaria.puntuak + 10
             else:
                 if self.zein == 1:
                     self.image = pygame.image.load("superboss3.png")
-
             self.btiro = self.btiro - 1
             if (self.btiro == 0):
                 self.bbmugitzen = True
@@ -351,23 +360,43 @@ class Boss(pygame.sprite.Sprite):
                     # balek jokalaria jotzen ote duten frogatu
                     if self.jokalaria.rect.colliderect(self.balaboss) == 1:
                         self.jokalaria.hasierarara()
-                        self.jokalaria.bizitzak -=1
-                        #print("jota")
+                        self.jokalaria.bizitzak -= 1
                 elif self.bbmugitzen and self.btiro == 30:
                     self.bbmugitzen = False
                     self.bbtiro = 1
                     self.balakjotzen = False
             screen.blit(self.image, self.rect)
+            screen.blit(text2,textpos2)
             pygame.display.update(self.rect)
         else:
+            textpuntuak = font2.render("Puntuak: " + str(self.jokalaria.puntuak), 1, (10, 10, 10))
+            textzorionak = font2.render("ZORIONAK, JOKOA AMAITU DUZU", 1, (10, 10, 10))
+            textpospuntuak = textpuntuak.get_rect(centerx=300, centery=240)
+            textposzorionak = textzorionak.get_rect(centerx=300, centery=200)
             print("ZORIONAK, JOKOA AMAITU DUZU!!!")
+            print("Egindako puntoak: " + str(self.jokalaria.puntuak))
             print("*********GAME OVER************")
+            print("*******************************")
+            #i = 0
+            #while (i<10000):
+            #    screen.blit(textpuntuak, textpospuntuak)
+            #    screen.blit(textzorionak, textposzorionak)
+            #    i += 1
+            self.kill()
+
             exit()
-            #print("boss mugitu" + str(self.mugi))
 
     def tiro(self, screen):
         bss = proiektila(self.rect.left + 20, self.rect.top + 55)
         return bss
+
+
+    def inprimatukolpeak(self):
+
+        kolpeak_graf = ""
+        for x in range(0, self.kolpeak):
+            kolpeak_graf = kolpeak_graf + " * "
+        return kolpeak_graf
 
 #********************************
 # 4.3.- AHATETXOA KLASEA
