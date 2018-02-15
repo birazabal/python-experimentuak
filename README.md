@@ -12,19 +12,25 @@
 </br>
 <b>5.- jokutxoa.py</b> > pygame liburutegiaz, jokua.py-ren hasiera.
 </br>
-<b>6.- jokua.py</b> > pygame-ekin eginiko nire lehen jokoa ;) 
+<b>6.- jokua.py</b> > Pygame-ekin eginiko nire lehen jokoa ;) 
+</br>
+<img src="jokua_v1.png" style="align:center"/>
 </br>
     <i>dependentziak:</i> pygame
 </br>
-    <i>beharrezko fitxategiak:</i>
+    <i>beharrezko fitxategiak (nolabait funtzionatu dezan...):</i>
 </br>
         hiperkuak.png
         hiperkuak2.png
         hiperkuakfondua2.png
-        hiperkuakfondua22.png
+        hiperkuakfondua1.png
         maltzurra1.png
         maltzurra2.png
         planeta.png
         planeta2.png
         superboss.png
+	superboss2.png
+	superboss3.png
+ </br>
+
 
